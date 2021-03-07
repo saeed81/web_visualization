@@ -1,0 +1,1 @@
+web_visualization contains html and javascript files for plotting data on the web with no third party library dependency. It uses html canvas for drawing data. 
