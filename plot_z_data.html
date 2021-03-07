@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	
+    </head>
+
+    <body>
+	<div id="wrapper" style="margin:0 auto;width:75%;height:500px;border:2px solid green;position:relative;">
+	    <canvas style="border:1px solid red;position:relative;object-fit: fill;">
+	    </canvas>
+	    <div style="display:none;"></div>
+	    <div style="display:none;"></div>
+	    <div style="display:none"></div>
+	</div>
+	<button style="width:15%;float:right;" onclick="downloadCanvas()">Spara Graf!</button>
+	<script>
+
+	 function downloadCanvas(){
+
+	     		 
+	     // get canvas data  
+	     var image = document.getElementsByTagName("CANVAS")[0].toDataURL();  
+	     // create temporary link  
+	     var tmpLink = document.createElement( 'a' );  
+	     tmpLink.download = 'image.png'; // set the name of the download file 
+	     tmpLink.href = image;  
+  
+    // temporarily add link to body and initiate the download  
+		 document.body.appendChild( tmpLink );  
+		 tmpLink.click();  
+		 document.body.removeChild( tmpLink );  
+	     
+	 }
+
+
+	 
+	 function isinrange(x,y,xmin,xmax,ymin,ymax){
+	     let result = 0
+	     if ( x >= xmin && x <= xmax && y >= ymin && y <= ymax) result = 1
+	     return result
+	 }
+	 
+	 function buildrange(){
+	     
+	     let range = []
+	     for (var i=0; i < 100; ++i){
+		 range.push(i *10.0)
+	     }
+	     return range
+	 }
+	 
+	 
+	 function getmaxdepth(hmax){
+	     
+	     range = buildrange()
+	     result = -1
+	     for (var j=0; j< range.length;++j){
+		 if (hmax <= range[j]){
+		     result = range[j]
+		     break 
+		     
+		 }
+	     }
+	     return result
+	 }
+
+	 
+	 function isindata(X, Y,px,py,temp,dh){
+	     let result = [-1,-1,-1, -1, -1]
+	     let radi = 10.0
+	     let istn = -1
+	     for (var i=0; i< px.length;++i){
+		 if (isinsymbol(px[i],py[i],radi,X,Y)){
+		     istn = i;
+		     break;
+		 }
+	     }
+	     
+	     result[0] = (istn !== -1) ? 1 : 0;
+	     if (result[0]) result[1] = temp[istn]
+	     if (result[0]) result[2] = dh[istn]
+	     if (result[0]) result[3] = px[istn]
+	     if (result[0]) result[4] = py[istn]
+	     
+	     return result;
+	 }
+
+	 function isinsymbol(i, j,radius, x, y){
+
+	     var result = (Math.sqrt(( x -i) * ( x -i) + ( y -j) * ( y -j)) <= (radius)) ? 1 : 0;
+	     return result;
+	 }
+
+
+	 function find_min_max(temp,depth){
+	     
+	     let xmin = []
+	     let ymin = []
+	     let xmax = []
+	     let ymax = []
+	     
+	     
+	     for (var j = 0; j < temp.length;++j){
+		 xmin.push(Math.floor(Math.min.apply(Math, temp[j])));
+		 xmax.push(Math.ceil(Math.max.apply(Math, temp[j])))
+		 ymin.push(Math.floor(Math.min.apply(Math, depth[j])));
+		 ymax.push(Math.ceil(Math.max.apply(Math, depth[j])));
+	     }
+	     let vmin = Math.floor(Math.min.apply(Math, xmin));
+	     let vmax = Math.ceil(Math.max.apply(Math, xmax));
+	     let hmin = Math.floor(Math.min.apply(Math, ymin));
+	     let hmax = Math.ceil(Math.max.apply(Math, ymax));
+	     
+	     return [vmin,vmax,hmin,hmax]
+	 }
+
+	 function getids(idw){
+
+	     let result = {"canv" : 0, "info" : 0, "circ" : 0, "legend" : 0}
+	     let nkey = 0 
+	     
+	     for (key in result){
+                 nkey++;
+             }
+	     
+	     let nf = 0
+	     for (var ii = 0; ii < wrapper.childNodes.length;++ii){
+		 if (wrapper.childNodes[ii].tagName !== undefined){ 
+		     if (wrapper.childNodes[ii].tagName.toLowerCase() === "canvas"){
+			 wrapper.childNodes[ii].id = idw + ii.toString()
+			 result.canv = wrapper.childNodes[ii].id
+		     }
+		     else if (wrapper.childNodes[ii].tagName.toLowerCase() === "div"){
+			 wrapper.childNodes[ii].id = idw + ii.toString()
+			 if (nf === 0) result.info   =  wrapper.childNodes[ii].id
+			 if (nf === 1) result.circ   =  wrapper.childNodes[ii].id
+			 if (nf === 2) result.legend =  wrapper.childNodes[ii].id
+			 nf++
+							
+		     }
+		 }
+	     }
+	     console.log(result)
+	     
+	     return result
+	 }
+	 
+	 function plot_profile(idw, options, data){
+
+	     let source = []
+	     let depth = []
+	     let temp = []
+	     
+	     for (x in data){
+		 source.push(x)
+	     }
+             
+	     for (x in data){
+		 let zh = []
+		 let vv = []
+		 for (y in data[x]){
+		     if (data[x][y] !== null){
+			 zh.push(parseFloat(y))
+			 vv.push(data[x][y])
+		     }
+		 }
+		 console.log(zh)
+		 console.log(vv)
+		 depth.push(zh)
+		 temp.push(vv)
+	     }
+
+	     let minmax =   find_min_max(temp,depth)
+	     let vmin = minmax[0];
+	     let vmax = minmax[1];
+	     let hmin = minmax[2];
+	     let hmax = minmax[3];
+	     hmax     = getmaxdepth(hmax)
+	     console.log(vmin + " " + vmax + " " + hmin + " " + hmax)
+             
+	     var wrapper = document.getElementById(idw)
+	     
+	     let ids = getids(idw)
+	     
+	     var canvas = document.getElementById(ids.canv);
+	     canvas.width=wrapper.clientWidth
+	     canvas.height=wrapper.clientHeight
+	     let width = canvas.width
+	     let height = canvas.height
+	     console.log("height",height,"width",width)
+	     
+	     var ctx = canvas.getContext("2d");
+	     	     
+	     let offsetx = Math.ceil(width / 4);
+	     let offsety = Math.ceil(height/ 8);
+	     let hp = height - 2 *offsety;
+	     let wp = width - 2 *offsetx;
+	     
+	     var pxt = []
+	     var pyt = []  
+	     for (var j=0; j < source.length;++j){
+		 
+		 var px = []
+		 var py = []
+
+		 for (var i=0; i < temp[j].length;i++){
+		     let x = offsetx + Math.ceil(wp*(temp[j][i] -vmin) / (vmax -vmin));
+		     let y = offsety + Math.ceil(hp*(depth[j][i] -hmin) / (hmax -hmin));
+		     px.push(x)
+		     py.push(y)
+		 }
+		 pxt.push(px)
+		 pyt.push(py)
+		 ctx.beginPath();
+		 ctx.lineJoin = "round";
+		 ctx.lineWidth = 2;
+		 ctx.font = "13px Arial";
+		 for (var i=0; i < temp[j].length;i++){
+		     ctx.lineTo(px[i],py[i])
+		 }
+		 ctx.strokeStyle = options.colors[j];
+		 ctx.stroke();
+	     }
+	     
+	     let dh = []
+	     let inc = (hmax - hmin) / (options.nyticks -1)
+	     for (var i=0; i < options.nyticks;++i){
+		 dh.push((hmin +i * inc).toFixed(2))
+	     }
+	     
+	     tiky = []
+	     for (var i=0; i < dh.length;i++){
+		 let y = offsety + Math.ceil(hp*(dh[i] -hmin) / (hmax -hmin));
+		 tiky.push(y)
+	     }
+	     ctx.beginPath();
+	     ctx.lineWidth = 0.5;
+	     for (var i=0; i < dh.length;i++){
+		 ctx.moveTo(offsetx,tiky[i])
+		 ctx.lineTo(width - offsetx,tiky[i])
+		 ctx.fillText(dh[i].toString(),offsetx- 1.2*ctx.measureText(dh[i].toString()).width , tiky[i]);
+	     }
+	     ctx.strokeStyle = "#000000";
+	     ctx.stroke();
+
+	     temp_axis = []
+	     inc = (vmax - vmin) / (options.nxticks -1)
+	     for (var i=0; i < options.nxticks;++i){
+		 temp_axis.push((vmin +i * inc))
+		 console.log(temp_axis[i])
+	     }
+             
+	     if (width < 300){
+		 
+		 temp_axis = []
+		 temp_axis.push(vmin)
+		 temp_axis.push(vmax)
+	     }
+
+	     var tikx = []
+	     for (var i=0; i < temp_axis.length;i++){
+		 y = offsetx + Math.ceil(wp*(temp_axis[i] -vmin) / (vmax - vmin));
+		 tikx.push(y)
+	     }
+	     ctx.beginPath();
+	     ctx.lineWidth = 0.5;
+	     ctx.font = "15px Arial";
+	     for (var i=0; i < temp_axis.length;i++){
+		 ctx.moveTo(tikx[i],height - offsety)
+		 ctx.lineTo(tikx[i],offsety)
+		 ctx.fillText(temp_axis[i].toFixed(1).toString(),tikx[i] - 0.5 *ctx.measureText(temp_axis[i].toFixed(1).toString()).width ,height - offsety + 1.20*ctx.measureText(temp_axis[i].toString()).actualBoundingBoxAscent);
+	     }
+	     ctx.strokeStyle = "#000000";
+	     ctx.stroke();
+	     
+	     
+	     ctx.beginPath();
+	     ctx.lineWidth = 0.5;
+	     ctx.moveTo(offsetx,offsety)
+	     ctx.lineTo(offsetx,height - offsety)
+	     ctx.strokeStyle = "#000000";
+	     ctx.stroke();
+	     
+
+	     ctx.beginPath();
+	     ctx.lineWidth = 0.5;
+	     ctx.moveTo(width -offsetx,offsety)
+	     ctx.lineTo(width -offsetx,height -offsety)
+	     ctx.strokeStyle = "#000000";
+	     ctx.stroke();
+	     
+	     //make title
+	     ctx.beginPath();
+	     ctx.font = "bold 14px Arial";
+	     ctx.textAlign = 'center';
+	     ctx.textBaseline = "bottom";
+	     ctx.fontStyle = "#000000";
+	     var text = options.title
+	     var m=ctx.measureText(text);
+	     ctx.fillText(text,width / 2 , offsety - 1.20*m.actualBoundingBoxAscent);
+
+	     //make xlabel
+	     ctx.beginPath();
+	     ctx.font = "bold 14px Arial";
+	     ctx.fontStyle = "#000000";
+	     var text = options.xlabel
+	     var m=ctx.measureText(text);
+	     ctx.fillText(text,width / 2, height - offsety / 2 + m.actualBoundingBoxAscent);
+
+
+	     //make ylabel
+	     ctx.font = "italic 14px Arial";
+	     ctx.fontStyle = "#000000";
+	     
+	     ctx.save();
+	     if (width >= 500){
+		 ctx.translate(0.75 * offsetx,height / 2 + 2.0*ctx.measureText(options.ylabel).actualBoundingBoxAscent );
+	     } else{
+		 ctx.translate(0.400 * offsetx,height / 2 + 2.0*ctx.measureText(options.ylabel).actualBoundingBoxAscent );
+	     }
+	     ctx.rotate(-Math.PI / 2);
+	     ctx.fillText(options.ylabel, 0 , 0);
+	     ctx.restore();
+	     
+	     
+	     leg = document.getElementById(ids.legend)
+	     leg.style.display = "block"
+	     leg.style.position = "absolute"
+	     leg.style.color = "black"
+	     leg.style.backgroundColor = "white"
+	     leg.style.width = `${0.8*offsetx}`.toString() + "px"
+	     leg.style.height = "250px"
+	     leg.style.border = "0px solid red"
+	     leg.style.top = "10px"
+	     leg.style.left = `${width - 0.80*offsetx}`.toString() + "px"
+	     leg.style.zIndex = 1
+	     leg.innerHTML = ""
+	     for (var j=0; j < source.length;++j){    
+		 leg.innerHTML += `<span style="color:${options.colors[j]}">${source[j]}</span><br>`
+	     }
+	     console.log(leg.innerHTML)
+
+
+	     
+	     
+	     canvas.addEventListener('mousemove', procmove, false);
+	     function procmove(e) {
+		 var x = e.offsetX==undefined?e.layerX:e.offsetX;
+		 var y = e.offsetY==undefined?e.layerY:e.offsetY;
+		 var bb=canvas.getBoundingClientRect();
+		 var mouseX=event.clientX-bb.left;
+		 var mouseY=event.clientY-bb.top;
+		 //console.log("Coordinates: (" +  mouseX + "," + mouseY + ")");
+		 var point = []
+		 for (var j=0; j < source.length;++j){
+		     point.push(isindata(mouseX, mouseY,pxt[j],pyt[j],temp[j],depth[j]))
+		 }
+		 
+		 var jt = -1
+		 for (var j=0; j < source.length;++j){
+     		     if (point[j][0]){
+			 console.log("point",point[j])
+			 jt = j
+			 break
+		     }
+		 }
+		 if (jt >=0){
+     		     circ = document.getElementById(ids.circ)
+		     circ.style.display = "block"
+		     circ.style.position = "absolute"
+		     circ.style.color = options.colors[jt]
+		     circ.style.backgroundColor = options.colors[jt]
+		     circ.style.width = "10px"
+		     circ.style.height = "10px"
+		     circ.style.border = "1px solid "+options.colors[jt]
+		     circ.style.borderRadius = "50%"
+		     circ.style.top = (point[jt][4]).toString()+"px"
+		     circ.style.left = (point[jt][3]).toString()+"px"
+		     circ.style.zIndex = 0
+		     
+		     info = document.getElementById(ids.info)
+		     info.style.display = "block"
+		     info.style.width = "175px"
+		     info.style.height = "50px"
+		     info.style.position = "absolute"
+		     info.style.top = (12+ point[jt][4]).toString()+"px"
+		     info.style.left = (12 + point[jt][3]).toString()+"px"
+		     info.style.border = "1px solid green"
+		     info.style.zIndex = 100
+		     info.style.backgroundColor = "white";
+		     info.style.color = "black"
+		     info.style.textAlign = "left"
+		     info.style.lineHeight = "20px"
+		     info.innerHTML = ""
+		     info.innerHTML += `<span style="text-align:center;">${point[jt][2].toString()}</span><br>`
+		     info.innerHTML +=  `<span>${source[jt]}:${point[jt][1].toString()}</span>`
+		     info.style.display = "block"
+		 }
+		 
+		 else{
+		     console.log(wrapper.childNodes)
+		     info = document.getElementById(ids.info)
+		     info.style.display = "none"
+		     circ = document.getElementById(ids.circ)
+		     circ.style.display = "none"
+		 }
+	     }
+	 }
+
+
+	 var data = {"OBS":{"1.0":2.0,"4.0":5.0,"5.0":11.0,"55":null},"NS01":{"2.0":4.0,"4.0":6.0,"6.0":1.0},"NS02":{"2.0":1.20,"4.0":null,"6.0":30.0}}
+
+	 var options = {
+	     
+	     colors : ["#FF0000","#0000FF","#FF00FF"],
+	     xlabel : "temperature (C)",
+	     ylabel : "Depth(cm)",
+	     title  : "",
+	     nyticks : 8,
+	     nxticks : 6
+	 }
+	 
+	 var id = "wrapper"
+	 plot_profile(id,options,data);
+	 
+	 window.addEventListener("resize", function(){
+	     plot_profile(id,options,data)});
+	 
+	</script>
+
+    </body>
+</html>
+
