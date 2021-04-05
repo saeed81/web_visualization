@@ -12,7 +12,7 @@
 	    <div style="display:none;"></div>
 	    <div style="display:none"></div>
 	</div>
-	<button style="width:15%;float:right;" onclick="downloadCanvas()">Spara Graf!</button>
+	<button style="width:15%;float:right;" onclick="downloadCanvas()">Download graph!</button>
 	<script>
 
 	 function downloadCanvas(){
@@ -408,13 +408,13 @@
 	 }
 
 
-	 var data = {"OBS":{"1.0":2.0,"4.0":5.0,"5.0":11.0,"55":null},"NS01":{"2.0":4.0,"4.0":6.0,"6.0":1.0},"NS02":{"2.0":1.20,"4.0":null,"6.0":30.0}}
+	 var data = {"exp1":{"1.0":2.0,"4.0":5.0,"5.0":11.0,"55":null},"exp2":{"2.0":4.0,"4.0":6.0,"6.0":1.0},"exp3":{"2.0":1.20,"4.0":null,"6.0":30.0}}
 
 	 var options = {
 	     
 	     colors : ["#FF0000","#0000FF","#FF00FF"],
-	     xlabel : "temperature (C)",
-	     ylabel : "Depth(cm)",
+	     xlabel : "X",
+	     ylabel : "Y",
 	     title  : "",
 	     nyticks : 8,
 	     nxticks : 6
