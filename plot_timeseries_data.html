@@ -85,7 +85,8 @@
 	     return result;
 	 }
 
-
+	 	 
+	 
 	 function find_min_max(temp,time){
 	     
 	     let xmin = []
@@ -233,7 +234,7 @@
 	     for (var i=0; i < dt.length;i++){
 		 ctx.moveTo(tikx[i],hp + offsety)
 		 ctx.lineTo(tikx[i],offsety)
-		 ctx.fillText(dt[i].toString(),tikx[i],hp+1.5*offsety);
+		 ctx.fillText(dt[i].toString(),tikx[i],hp+1.2*offsety);
 	     }
 	     ctx.strokeStyle = "#000000";
 	     ctx.stroke();
@@ -263,7 +264,7 @@
 	     for (var i=0; i < temp_axis.length;i++){
 		 ctx.moveTo(offsetx,tiky[i])
 		 ctx.lineTo(wp+offsetx,tiky[i])
-		 ctx.fillText(temp_axis[i].toFixed(1).toString(),0.75*offsetx,tiky[i]+5);
+		 ctx.fillText(temp_axis[i].toFixed(1).toString(),0.88*offsetx,tiky[i]);
 	     }
 	     ctx.strokeStyle = "#000000";
 	     ctx.stroke();
@@ -387,8 +388,8 @@
 		     info.style.textAlign = "left"
 		     info.style.lineHeight = "20px"
 		     info.innerHTML = ""
-		     info.innerHTML += `<span style="text-align:center;">${point[jt][2].toString()}</span><br>`
-		     info.innerHTML +=  `<span>${source[jt]}:${point[jt][1].toString()}</span>`
+		     info.innerHTML += `<span style="text-align:center;">${point[jt][1].toString()}</span><br>`
+		     info.innerHTML +=  `<span>${source[jt]}:${point[jt][2].toString()}</span>`
 		     info.style.display = "block"
 		 }
 		 
@@ -403,16 +404,16 @@
 	 }
 
 
-	 var data = {"exp1":{"0.0":0.0,"2.0":2.0,"3.0":3.0,"4.0":null},"exp2":{"0.0":0.0,"1.0":2.0,"2.0":4.0,"3.0":6.0},"exp3":{"0.0":0.0,"1.0":null,"2.0":8.0}}
+	 var data = {"exp1":{"0.0":0.0,"2.0":-2.0,"3.0":3.0,"4.0":null,"5.0":-5.0},"exp2":{"0.0":0.0,"1.0":2.0,"2.0":4.0,"3.0":6.0},"exp3":{"0.0":0.0,"1.0":null,"2.0":8.0}}
 
 	 var options = {
 	     
 	     colors : ["#FF0000","#0000FF","#00FF00"],
 	     xlabel : "X",
 	     ylabel : "Y",
-	     title  : "",
+	     title  : "Y vs X",
 	     nyticks : 5,
-	     nxticks : 4
+	     nxticks : 6
 	 }
 	 
 	 var id = "wrapper"
