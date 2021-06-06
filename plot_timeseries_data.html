@@ -236,7 +236,9 @@
 	     for (var i=0; i < dt.length;i++){
 		 ctx.moveTo(tikx[i],hp + offsety)
 		 ctx.lineTo(tikx[i],offsety)
-		 ctx.fillText(dt[i].toString(),tikx[i],hp+1.2*offsety);
+		 m = ctx.measureText(dt[i].toString())
+		 htext = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent
+		 ctx.fillText(dt[i].toString(),tikx[i] - m.width /2.0,hp+offsety+2.0*htext);
 	     }
 	     ctx.strokeStyle = "#000000";
 	     ctx.stroke();
@@ -408,7 +410,7 @@
 	 }
 
 
-	 var data = {"exp1":{"0.0":0.0,"2.0":-2.0,"3.0":3.0,"4.0":null,"5.0":-5.0},"exp2":{"0.0":0.0,"1.0":2.0,"2.0":4.0,"3.0":6.0},"exp3":{"0.0":0.0,"1.0":null,"2.0":8.0}}
+	 var data = {"exp1":{"0.0":0.0,"1.0":1.0,"2.0":-2.0,"3.0":3.0,"4.0":-4.0},"exp2":{"0.0":1.0,"1.0":2.0,"2.0":-1.0,"3.0":4.0,"4.0":-3.0},"exp3":{"0.0":2.0,"1.0":3.0,"2.0":0.0,"3.0":5.0,"4.0":-2.0}}
 
 	 var options = {
 	     
@@ -416,8 +418,8 @@
 	     xlabel : "X",
 	     ylabel : "Y",
 	     title  : "Y vs X",
-	     nyticks : 5,
-	     nxticks : 6
+	     nyticks : 10,
+	     nxticks : 5
 	 }
 	 
 	 var id = "wrapper"
