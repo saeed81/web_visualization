@@ -6,8 +6,9 @@
 
     <body>
 	
-	<div style="width:50%;height:50px;margin:0 auto;"><input id="irange" type="range" min="1" max="360" value="1" style="width:100%;" oninput="rotateline()"></input></div>  
-	<div id="wrapper" style="margin:0 auto;width:95%;height:500px;border:2px solid green;position:relative;">
+	<div style="width:50%;height:50px;margin:0 auto;"><input id="irange" type="range" min="0" max="360" value="0" style="width:100%;" oninput="rotateline()"></input></div>
+	<div style="width:30px;height:15px;margin:-5px auto;border:0px solid red;text-align:center;"><input type="text" id="angle" style="width:100%;border:0px;" value="0"></input></div>
+	<div id="wrapper" style="margin:25px auto;width:95%;height:500px;border:2px solid green;position:relative;">
 	    <canvas style="border:1px solid red;position:relative;object-fit: fill;">
 	    </canvas>
 	    <div style="display:none;"></div>
@@ -25,9 +26,13 @@
 	 
 	 function rotateline(){
 
-	     var slider = document.getElementById("irange");
-    
+	     let slider = document.getElementById("irange");
+
+	     document.getElementById("angle").value = slider.value;
+	     
 	     plot_direction_dynamic("dir",slider.value);
+
+	     
 	     
 	 }
 
@@ -215,18 +220,18 @@
 	     
 	     ctx1.beginPath();
 	     ctx1.moveTo(width/2, height/2);
-	     ctx1.lineTo(width/2 + width/8, height /2 - height /16);
+	     ctx1.lineTo(width/2 + width/8, height /2 - height /8);
 	     ctx1.stroke(); 
 
 
-	     let wtr = 4;
+	     //let wtr = 4;
 	     
-	     ctx1.beginPath();
-	     ctx1.moveTo(width/2 + width/8 + wtr, height /2 - height /16 - wtr);
-	     ctx1.lineTo(width/2 + width/8 - wtr, height /2 - height /16 - wtr);
-	     ctx1.lineTo(width/2 + width/8 + wtr, height /2 - height /16 + wtr);
-	     ctx1.fillStyle = "white";
-	     ctx1.fill();
+	     //ctx1.beginPath();
+	     //ctx1.moveTo(width/2 + width/8 + wtr, height /2 - height /16 - wtr);
+	     //ctx1.lineTo(width/2 + width/8 - wtr, height /2 - height /16 - wtr);
+	     //ctx1.lineTo(width/2 + width/8 + wtr, height /2 - height /16 + wtr);
+	     //ctx1.fillStyle = "white";
+	     //ctx1.fill();
 
 	     }
 
@@ -276,13 +281,13 @@
 	     
 	     let deg2rd = wtr * Math.PI / 180.0; 
 
-	     let xnew = width/8 * Math.sin(deg2rd) + height / 16 *Math.cos(deg2rd);
-	     let ynew = width/8 * Math.cos(deg2rd) - height / 16 *Math.sin(deg2rd);
+	     let xnew = width/8 * Math.cos(deg2rd)  - height / 8 *Math.sin(deg2rd);
+	     let ynew = width/8 * Math.sin (deg2rd) + height / 8 *Math.cos(deg2rd);
 	     
 	     console.log("deg2rd "+deg2rd);
 	     ctx1.beginPath();
 	     ctx1.moveTo(width/2, height/2);
-	     ctx1.lineTo(width/2 + xnew, width/2 + ynew);
+	     ctx1.lineTo(width/2 + xnew, height/2 - ynew);
 	     ctx1.stroke(); 
 
 	     }
