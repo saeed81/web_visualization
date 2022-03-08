@@ -16,7 +16,7 @@
 	    <div style="display:none"></div>
 	</div>
 
-	<div id="dir" style="margin:0 auto;width:25%;height:300px;border:1px solid red;position:absolute;top:75px;right:5%;"> 
+	<div id="dir" style="margin:0 auto;width:20%;height:150px;border:1px solid red;position:absolute;top:75px;right:5%;"> 
 	    <canvas id="current" style="border:1px solid red;position:relative;object-fit: fill;"></canvas>
 	</div>
 	<button style="width:15%;float:right;" onclick="downloadCanvas()">Download graph!</button>
@@ -173,6 +173,7 @@
 	 
 	     let wrapper = document.getElementById(idw)
 	     
+	     
 	     let width  = wrapper.clientWidth
 	     let height = wrapper.clientHeight
 	     	     	     
@@ -194,44 +195,50 @@
 	     let ctx1 = current.getContext("2d");
 	     ctx1.fillStyle = "white";
 	     ctx1.fillRect(0,0,current.width,current.height);
-
+	     
+	     let radius = height/4;
+	     let centerx = width  / 2;
+	     let centery = height / 2;
+	     
+	     
 	     ctx1.fillStyle = "black";
 	     ctx1.beginPath();
-	     ctx1.arc(width/2, height/2, width/4, 0, 2.0 * Math.PI);
+	     ctx1.arc(centerx, centery, radius, 0, 2.0 * Math.PI);
 	     ctx1.stroke(); 
 	       
 	     ctx1.beginPath();
-	     ctx1.moveTo(width/4, height/2);
-	     ctx1.lineTo(width*0.75, height/2);
+	     ctx1.moveTo(centerx - radius, centery);
+	     ctx1.lineTo(centerx + radius, centery);
 	     ctx1.stroke(); 
 
 
 	     ctx1.beginPath();
-	     ctx1.moveTo(width/2, height/2-width/4);
-	     ctx1.lineTo(width/2, height/2+width/4);
+	     ctx1.moveTo(centerx, centery - radius);
+	     ctx1.lineTo(centerx, centery + radius);
+	     ctx1.stroke(); 
+	          
+	     
+	     ctx1.beginPath();
+	     ctx1.moveTo(centerx, height/2);
+	     ctx1.lineTo(centerx + width/8, height /2 - height /8);
 	     ctx1.stroke(); 
 
 
-     
+	     
+	     let x1 = width/8;
+	     let y1 = height /8;
 
-
-
+	     let xv =  4;
+	     
+	     let yv = xv * y1 / x1;
 
 	     
 	     ctx1.beginPath();
-	     ctx1.moveTo(width/2, height/2);
-	     ctx1.lineTo(width/2 + width/8, height /2 - height /8);
-	     ctx1.stroke(); 
-
-
-	     //let wtr = 4;
-	     
-	     //ctx1.beginPath();
-	     //ctx1.moveTo(width/2 + width/8 + wtr, height /2 - height /16 - wtr);
-	     //ctx1.lineTo(width/2 + width/8 - wtr, height /2 - height /16 - wtr);
-	     //ctx1.lineTo(width/2 + width/8 + wtr, height /2 - height /16 + wtr);
-	     //ctx1.fillStyle = "white";
-	     //ctx1.fill();
+	     ctx1.moveTo(width/2 + x1 + xv, height /2 - y1 - yv);
+	     ctx1.lineTo(width/2 + x1 - xv, height /2 - y1 - yv);
+	     ctx1.lineTo(width/2 + x1 + xv, height /2 - y1 + yv);
+	     ctx1.fillStyle = "red";
+	     ctx1.fill();
 
 	     }
 
@@ -239,7 +246,7 @@
 	 function plot_direction_dynamic(idw,wtr){
 	 
 	     let wrapper = document.getElementById(idw)
-	     
+
 	     let width  = wrapper.clientWidth
 	     let height = wrapper.clientHeight
 	     	     	     
@@ -262,22 +269,29 @@
 	     ctx1.fillStyle = "white";
 	     ctx1.fillRect(0,0,current.width,current.height);
 
+	     
+	     let radius = height/4;
+	     let centerx = width  / 2;
+	     let centery = height / 2;
+	     
+	     
 	     ctx1.fillStyle = "black";
 	     ctx1.beginPath();
-	     ctx1.arc(width/2, height/2, width/4, 0, 2.0 * Math.PI);
+	     ctx1.arc(centerx, centery, radius, 0, 2.0 * Math.PI);
 	     ctx1.stroke(); 
 	       
 	     ctx1.beginPath();
-	     ctx1.moveTo(width/4, height/2);
-	     ctx1.lineTo(width*0.75, height/2);
+	     ctx1.moveTo(centerx - radius, centery);
+	     ctx1.lineTo(centerx + radius, centery);
 	     ctx1.stroke(); 
 
 
 	     ctx1.beginPath();
-	     ctx1.moveTo(width/2, height/2-width/4);
-	     ctx1.lineTo(width/2, height/2+width/4);
+	     ctx1.moveTo(centerx, centery - radius);
+	     ctx1.lineTo(centerx, centery + radius);
 	     ctx1.stroke(); 
-
+	     
+	     
 	     
 	     let deg2rd = wtr * Math.PI / 180.0; 
 
@@ -290,6 +304,27 @@
 	     ctx1.lineTo(width/2 + xnew, height/2 - ynew);
 	     ctx1.stroke(); 
 
+
+	     let x1 = xnew;
+	     let y1 = ynew;
+
+	     let xv =  1;
+	     
+	     let yv = xv * y1 / x1;
+
+	     
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/2 + x1 + xv, height /2 - y1 - yv);
+	     ctx1.lineTo(width/2 + x1 - xv, height /2 - y1 - yv);
+	     ctx1.lineTo(width/2 + x1 + xv, height /2 - y1 + yv);
+	     ctx1.fillStyle = "red";
+	     ctx1.fill();
+
+	     
+
+
+
+	     
 	     }
 		 
 	     
