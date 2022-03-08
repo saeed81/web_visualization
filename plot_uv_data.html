@@ -1,32 +1,57 @@
 <!DOCTYPE html>
 <html>
     <head>
-	<meta charset="utf-8">
+	
     </head>
 
     <body>
-	<div id="wrapper" style="margin:0 auto;width:75%;height:500px;border:2px solid green;position:relative;">
+	
+	<div style="width:50%;height:50px;margin:0 auto;"><input id="irange" type="range" min="1" max="360" value="1" style="width:100%;" oninput="rotateline()"></input></div>  
+	<div id="wrapper" style="margin:0 auto;width:95%;height:500px;border:2px solid green;position:relative;">
 	    <canvas style="border:1px solid red;position:relative;object-fit: fill;">
 	    </canvas>
 	    <div style="display:none;"></div>
 	    <div style="display:none;"></div>
 	    <div style="display:none"></div>
 	</div>
+
+	<div id="dir" style="margin:0 auto;width:25%;height:300px;border:1px solid red;position:absolute;top:75px;right:5%;"> 
+	    <canvas id="current" style="border:1px solid red;position:relative;object-fit: fill;"></canvas>
+	</div>
 	<button style="width:15%;float:right;" onclick="downloadCanvas()">Download graph!</button>
 	<script>
 
+
+	 
+	 function rotateline(){
+
+	     var slider = document.getElementById("irange");
+    
+	     plot_direction_dynamic("dir",slider.value);
+	     
+	 }
+
+
+
+
 	 function downloadCanvas(){
+
+	     		 
 	     // get canvas data  
 	     var image = document.getElementsByTagName("CANVAS")[0].toDataURL();  
 	     // create temporary link  
 	     var tmpLink = document.createElement( 'a' );  
-	     tmpLink.download = 'image.pdf'; // set the name of the download file 
+	     tmpLink.download = 'image.png'; // set the name of the download file 
 	     tmpLink.href = image;  
-	     // temporarily add link to body and initiate the download  
-	     document.body.appendChild( tmpLink );  
-	     tmpLink.click();  
-	     document.body.removeChild( tmpLink );  
+  
+    // temporarily add link to body and initiate the download  
+		 document.body.appendChild( tmpLink );  
+		 tmpLink.click();  
+		 document.body.removeChild( tmpLink );  
+	     
 	 }
+
+
 	 
 	 function isinrange(x,y,xmin,xmax,ymin,ymax){
 	     let result = 0
@@ -85,9 +110,8 @@
 	     return result;
 	 }
 
-	 	 
-	 
-	 function find_min_max(temp,time){
+
+	 function find_min_max(temp,depth){
 	     
 	     let xmin = []
 	     let ymin = []
@@ -96,17 +120,17 @@
 	     
 	     
 	     for (var j = 0; j < temp.length;++j){
-		 ymin.push(Math.floor(Math.min.apply(Math, temp[j])));
-		 ymax.push(Math.ceil(Math.max.apply(Math, temp[j])))
-		 xmin.push(Math.floor(Math.min.apply(Math, time[j])));
-		 xmax.push(Math.ceil(Math.max.apply(Math, time[j])));
+		 xmin.push(Math.floor(Math.min.apply(Math, temp[j])));
+		 xmax.push(Math.ceil(Math.max.apply(Math, temp[j])))
+		 ymin.push(Math.floor(Math.min.apply(Math, depth[j])));
+		 ymax.push(Math.ceil(Math.max.apply(Math, depth[j])));
 	     }
-	     let tmin = Math.floor(Math.min.apply(Math, xmin));
-	     let tmax = Math.ceil(Math.max.apply(Math, xmax));
-	     let vmin = Math.floor(Math.min.apply(Math, ymin));
-	     let vmax = Math.ceil(Math.max.apply(Math, ymax));
+	     let vmin = Math.floor(Math.min.apply(Math, xmin));
+	     let vmax = Math.ceil(Math.max.apply(Math, xmax));
+	     let hmin = Math.floor(Math.min.apply(Math, ymin));
+	     let hmax = Math.ceil(Math.max.apply(Math, ymax));
 	     
-	     return [tmin,tmax,vmin,vmax]
+	     return [vmin,vmax,hmin,hmax]
 	 }
 
 	 function getids(idw){
@@ -126,10 +150,10 @@
 			 result.canv = wrapper.childNodes[ii].id
 		     }
 		     else if (wrapper.childNodes[ii].tagName.toLowerCase() === "div"){
-			 wrapper.childNodes[ii].id = idw + ii.toString()
-			 if (nf === 0) result.info   =  wrapper.childNodes[ii].id
-			 if (nf === 1) result.circ   =  wrapper.childNodes[ii].id
-			 if (nf === 2) result.legend =  wrapper.childNodes[ii].id
+			 wrapper.childNodes[ii].id    = idw + ii.toString()
+			 if (nf === 0) result.info    =  wrapper.childNodes[ii].id
+			 if (nf === 1) result.circ    =  wrapper.childNodes[ii].id
+			 if (nf === 2) result.legend  =  wrapper.childNodes[ii].id
 			 nf++
 							
 		     }
@@ -139,11 +163,139 @@
 	     
 	     return result
 	 }
+
+	 function plot_direction(idw){
+	 
+	     let wrapper = document.getElementById(idw)
+	     
+	     let width  = wrapper.clientWidth
+	     let height = wrapper.clientHeight
+	     	     	     
+	     let offsetx = Math.ceil(width / 4);
+	     let offsety = Math.ceil(height/ 8);
+	     
+
+	     let  current = document.getElementById("current")
+
+	     console.log("width is "+width + " height "+height);
+	     
+
+	     current.width  = width;
+	     current.height = height;
+	     current.style.zIndex = 2
+	     
+	     //console.log(compass.innerHTML)
+  
+	     let ctx1 = current.getContext("2d");
+	     ctx1.fillStyle = "white";
+	     ctx1.fillRect(0,0,current.width,current.height);
+
+	     ctx1.fillStyle = "black";
+	     ctx1.beginPath();
+	     ctx1.arc(width/2, height/2, width/4, 0, 2.0 * Math.PI);
+	     ctx1.stroke(); 
+	       
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/4, height/2);
+	     ctx1.lineTo(width*0.75, height/2);
+	     ctx1.stroke(); 
+
+
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/2, height/2-width/4);
+	     ctx1.lineTo(width/2, height/2+width/4);
+	     ctx1.stroke(); 
+
+
+     
+
+
+
+
+	     
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/2, height/2);
+	     ctx1.lineTo(width/2 + width/8, height /2 - height /16);
+	     ctx1.stroke(); 
+
+
+	     let wtr = 4;
+	     
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/2 + width/8 + wtr, height /2 - height /16 - wtr);
+	     ctx1.lineTo(width/2 + width/8 - wtr, height /2 - height /16 - wtr);
+	     ctx1.lineTo(width/2 + width/8 + wtr, height /2 - height /16 + wtr);
+	     ctx1.fillStyle = "white";
+	     ctx1.fill();
+
+	     }
+
+
+	 function plot_direction_dynamic(idw,wtr){
+	 
+	     let wrapper = document.getElementById(idw)
+	     
+	     let width  = wrapper.clientWidth
+	     let height = wrapper.clientHeight
+	     	     	     
+	     let offsetx = Math.ceil(width / 4);
+	     let offsety = Math.ceil(height/ 8);
+	     
+
+	     let  current = document.getElementById("current")
+
+	     console.log("width is "+width + " height "+height);
+	     
+
+	     current.width  = width;
+	     current.height = height;
+	     current.style.zIndex = 2
+	     
+	     //console.log(compass.innerHTML)
+  
+	     let ctx1 = current.getContext("2d");
+	     ctx1.fillStyle = "white";
+	     ctx1.fillRect(0,0,current.width,current.height);
+
+	     ctx1.fillStyle = "black";
+	     ctx1.beginPath();
+	     ctx1.arc(width/2, height/2, width/4, 0, 2.0 * Math.PI);
+	     ctx1.stroke(); 
+	       
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/4, height/2);
+	     ctx1.lineTo(width*0.75, height/2);
+	     ctx1.stroke(); 
+
+
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/2, height/2-width/4);
+	     ctx1.lineTo(width/2, height/2+width/4);
+	     ctx1.stroke(); 
+
+	     
+	     let deg2rd = wtr * Math.PI / 180.0; 
+
+	     let xnew = width/8 * Math.sin(deg2rd) + height / 16 *Math.cos(deg2rd);
+	     let ynew = width/8 * Math.cos(deg2rd) - height / 16 *Math.sin(deg2rd);
+	     
+	     console.log("deg2rd "+deg2rd);
+	     ctx1.beginPath();
+	     ctx1.moveTo(width/2, height/2);
+	     ctx1.lineTo(width/2 + xnew, width/2 + ynew);
+	     ctx1.stroke(); 
+
+	     }
+		 
+	     
+	 
+
+
 	 
 	 function plot_profile(idw, options, data){
 
 	     let source = []
-	     let time = []
+	     let depth = []
 	     let temp = []
 	     
 	     for (x in data){
@@ -151,27 +303,27 @@
 	     }
              
 	     for (x in data){
-		 let zt = []
+		 let zh = []
 		 let vv = []
 		 for (y in data[x]){
 		     if (data[x][y] !== null){
-			 zt.push(parseFloat(y))
+			 zh.push(parseFloat(y))
 			 vv.push(data[x][y])
 		     }
 		 }
-		 console.log(zt)
+		 console.log(zh)
 		 console.log(vv)
-		 time.push(zt)
+		 depth.push(zh)
 		 temp.push(vv)
 	     }
 
-	     let minmax =   find_min_max(temp,time)
-	     let tmin = minmax[0];
-	     let tmax = minmax[1];
-	     let vmin = minmax[2];
-	     let vmax = minmax[3];
-	     //hmax     = getmaxdepth(hmax)
-	     console.log(vmin + " " + vmax + " " + tmin + " " + tmax)
+	     let minmax =   find_min_max(temp,depth)
+	     let vmin = minmax[0];
+	     let vmax = minmax[1];
+	     let hmin = minmax[2];
+	     let hmax = minmax[3];
+	     hmax     = getmaxdepth(hmax)
+	     console.log(vmin + " " + vmax + " " + hmin + " " + hmax)
              
 	     var wrapper = document.getElementById(idw)
 	     
@@ -189,7 +341,7 @@
 	     let offsetx = Math.ceil(width / 4);
 	     let offsety = Math.ceil(height/ 8);
 	     let hp = height - 2 *offsety;
-	     let wp = width  - 2 *offsetx;
+	     let wp = width - 2 *offsetx;
 	     
 	     var pxt = []
 	     var pyt = []  
@@ -199,8 +351,8 @@
 		 var py = []
 
 		 for (var i=0; i < temp[j].length;i++){
-		     let y = offsety + Math.ceil(hp - hp*(temp[j][i] -vmin) / (vmax -vmin));
-		     let x = offsetx + Math.ceil(wp*(time[j][i] -tmin) / (tmax -tmin));
+		     let x = offsetx + Math.ceil(wp*(temp[j][i] -vmin) / (vmax -vmin));
+		     let y = offsety + Math.ceil(hp*(depth[j][i] -hmin) / (hmax -hmin));
 		     px.push(x)
 		     py.push(y)
 		 }
@@ -210,42 +362,37 @@
 		 ctx.lineJoin = "round";
 		 ctx.lineWidth = 2;
 		 ctx.font = "13px Arial";
-		 ctx.moveTo(px[0],py[0]);
-		 for (var i=1; i < temp[j].length;i++){
+		 for (var i=0; i < temp[j].length;i++){
 		     ctx.lineTo(px[i],py[i])
 		 }
 		 ctx.strokeStyle = options.colors[j];
 		 ctx.stroke();
 	     }
 	     
-	     let dt = []
-	     let inc = (tmax - tmin) / (options.nxticks -1)
-	     for (var i=0; i < options.nxticks;++i){
-		 dt.push((tmin +i * inc).toFixed(2))
+	     let dh = []
+	     let inc = (hmax - hmin) / (options.nyticks -1)
+	     for (var i=0; i < options.nyticks;++i){
+		 dh.push((hmin +i * inc).toFixed(2))
 	     }
 	     
-	     tikx = []
-	     for (var i=0; i < dt.length;i++){
-		 let x = offsetx + Math.ceil(wp*(dt[i] -tmin) / (tmax -tmin));
-		 tikx.push(x)
+	     tiky = []
+	     for (var i=0; i < dh.length;i++){
+		 let y = offsety + Math.ceil(hp*(dh[i] -hmin) / (hmax -hmin));
+		 tiky.push(y)
 	     }
-
-	     	     
 	     ctx.beginPath();
 	     ctx.lineWidth = 0.5;
-	     for (var i=0; i < dt.length;i++){
-		 ctx.moveTo(tikx[i],hp + offsety)
-		 ctx.lineTo(tikx[i],offsety)
-		 m = ctx.measureText(dt[i].toString())
-		 htext = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent
-		 ctx.fillText(dt[i].toString(),tikx[i] - m.width /2.0,hp+offsety+2.0*htext);
+	     for (var i=0; i < dh.length;i++){
+		 ctx.moveTo(offsetx,tiky[i])
+		 ctx.lineTo(width - offsetx,tiky[i])
+		 ctx.fillText(dh[i].toString(),offsetx- 1.2*ctx.measureText(dh[i].toString()).width , tiky[i]);
 	     }
 	     ctx.strokeStyle = "#000000";
 	     ctx.stroke();
 
 	     temp_axis = []
-	     inc = (vmax - vmin) / (options.nyticks -1)
-	     for (var i=0; i < options.nyticks;++i){
+	     inc = (vmax - vmin) / (options.nxticks -1)
+	     for (var i=0; i < options.nxticks;++i){
 		 temp_axis.push((vmin +i * inc))
 		 console.log(temp_axis[i])
 	     }
@@ -256,21 +403,19 @@
 		 temp_axis.push(vmin)
 		 temp_axis.push(vmax)
 	     }
-	     
-	     var tiky = []
+
+	     var tikx = []
 	     for (var i=0; i < temp_axis.length;i++){
-		 y = offsety + Math.ceil(hp-hp*(temp_axis[i] -vmin) / (vmax - vmin));
-		 tiky.push(y)
+		 y = offsetx + Math.ceil(wp*(temp_axis[i] -vmin) / (vmax - vmin));
+		 tikx.push(y)
 	     }
 	     ctx.beginPath();
 	     ctx.lineWidth = 0.5;
 	     ctx.font = "15px Arial";
 	     for (var i=0; i < temp_axis.length;i++){
-		 ctx.moveTo(offsetx,tiky[i])
-		 ctx.lineTo(wp+offsetx,tiky[i])
-		 m = ctx.measureText(temp_axis[i].toFixed(1).toString())
-		 htext = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent
-		 ctx.fillText(temp_axis[i].toFixed(1).toString(),offsetx - 1.1*m.width,tiky[i] +htext/2.0);
+		 ctx.moveTo(tikx[i],height - offsety)
+		 ctx.lineTo(tikx[i],offsety)
+		 ctx.fillText(temp_axis[i].toFixed(1).toString(),tikx[i] - 0.5 *ctx.measureText(temp_axis[i].toFixed(1).toString()).width ,height - offsety + 1.20*ctx.measureText(temp_axis[i].toString()).actualBoundingBoxAscent);
 	     }
 	     ctx.strokeStyle = "#000000";
 	     ctx.stroke();
@@ -326,7 +471,7 @@
 	     
 	     
 	     leg = document.getElementById(ids.legend)
-	     leg.style.display = "block"
+	     leg.style.display = "none"
 	     leg.style.position = "absolute"
 	     leg.style.color = "black"
 	     leg.style.backgroundColor = "white"
@@ -343,6 +488,16 @@
 	     console.log(leg.innerHTML)
 
 
+
+	     
+
+	     //ctx1.beginPath();
+	     //ctx1.moveTo(0, 0);
+	     //ctx1.lineTo(100, 100);
+	     //ctx1.stroke();
+
+	     
+
 	     
 	     
 	     canvas.addEventListener('mousemove', procmove, false);
@@ -355,7 +510,7 @@
 		 //console.log("Coordinates: (" +  mouseX + "," + mouseY + ")");
 		 var point = []
 		 for (var j=0; j < source.length;++j){
-		     point.push(isindata(mouseX, mouseY,pxt[j],pyt[j],temp[j],time[j]))
+		     point.push(isindata(mouseX, mouseY,pxt[j],pyt[j],temp[j],depth[j]))
 		 }
 		 
 		 var jt = -1
@@ -394,8 +549,8 @@
 		     info.style.textAlign = "left"
 		     info.style.lineHeight = "20px"
 		     info.innerHTML = ""
-		     info.innerHTML += `<span style="text-align:center;">${point[jt][1].toString()}</span><br>`
-		     info.innerHTML +=  `<span>${source[jt]}:${point[jt][2].toString()}</span>`
+		     info.innerHTML += `<span style="text-align:center;">${point[jt][2].toString()}</span><br>`
+		     info.innerHTML +=  `<span>${source[jt]}:${point[jt][1].toString()}</span>`
 		     info.style.display = "block"
 		 }
 		 
@@ -410,23 +565,29 @@
 	 }
 
 
-	 var data = {"exp1":{0.0:0.0,1.0:1.0,2.0:-2.0,3.0:3.0,4.0:-4.0},"exp2":{0.0:1.0,1.0:2.0,2.0:-1.0,3.0:4.0,4.0:-3.0},"exp3":{0.0:2.0,1.0:3.0,2.0:0.0,3.0:5.0,4.0:-2.0}}
+	 var data = {"exp1":{"1.0":2.0,"4.0":5.0,"5.0":11.0,"55":null},"exp2":{"2.0":4.0,"4.0":6.0,"6.0":1.0},"exp3":{"2.0":1.20,"4.0":null,"6.0":30.0}}
 
 	 var options = {
 	     
-	     colors : ["#FF0000","#0000FF","#00FF00"],
+	     colors : ["#FF0000","#0000FF","#FF00FF"],
 	     xlabel : "X",
 	     ylabel : "Y",
-	     title  : "Y vs X",
-	     nyticks : 10,
-	     nxticks : 5
+	     title  : "",
+	     nyticks : 8,
+	     nxticks : 6
 	 }
 	 
 	 var id = "wrapper"
 	 plot_profile(id,options,data);
+	 plot_direction("dir");
 	 
 	 window.addEventListener("resize", function(){
-	     plot_profile(id,options,data)});
+	     plot_profile(id,options,data)
+	     plot_direction("dir")
+	     
+
+
+	 });
 	 
 	</script>
 
